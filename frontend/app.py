@@ -3,7 +3,7 @@ import requests
 
 st.title("🎓 Student Performance Predictor")
 
-st.header("Enter Student Information")
+st.header("Predict Final Grade")
 
 # Numerical inputs
 col1, col2 = st.columns(2)
@@ -39,7 +39,4 @@ if st.button("Predict"):
     res = requests.post("http://localhost:8000/predict", json=data)
     result = res.json()
     prediction = result["prediction"]
-    if prediction == 1:
-        st.success("The student is predicted to PASS!")
-    else:
-        st.error("The student is predicted to FAIL!")
+    st.success(f"Predicted Final Score: {prediction}/20")

@@ -3,13 +3,13 @@ import numpy as np
 import pickle
 
 from sklearn.model_selection import train_test_split
-from sklearn.preprocessing import StandardScaler, LabelEncoder
-from sklearn.metrics import accuracy_score, classification_report
+from sklearn.preprocessing import StandardScaler
+from sklearn.metrics import mean_absolute_error, r2_score
 
-from sklearn.linear_model import LogisticRegression
-from sklearn.ensemble import RandomForestClassifier
-from sklearn.tree import DecisionTreeClassifier
-from sklearn.neighbors import KNeighborsClassifier
+from sklearn.linear_model import LinearRegression
+from sklearn.ensemble import RandomForestRegressor
+from sklearn.tree import DecisionTreeRegressor
+from sklearn.neighbors import KNeighborsRegressor
 
 
 # 1. LOAD DATA
@@ -31,12 +31,12 @@ df = df.dropna()
 #....................................................
 # 3. FEATURE ENGINEERING
 
-# Create PASS/FAIL target
-df["pass"] = df["G3"].apply(lambda x: 1 if x >= 10 else 0)
+# Target is the final grade G3
+df["target"] = df["G3"]
 
 # Select only the specified features
 selected_features = ["studytime", "failures", "absences", "Medu", "Fedu", "famrel", "goout", "Dalc", "Walc", "health"]
-df = df[selected_features + ["pass"]]
+df = df[selected_features + ["target"]]
 
 # ...............................................
 # 4. ENCODE CATEGORICAL DATA
@@ -49,8 +49,8 @@ print("\nUsing selected features:", selected_features)
 # 5. SPLIT DATA
 
 
-X = df.drop("pass", axis=1)
-y = df["pass"]
+X = df.drop("target", axis=1)
+y = df["target"]
 
 X_train, X_test, y_train, y_test = train_test_split(
     X, y, test_size=0.2, random_state=42
@@ -70,14 +70,14 @@ X_test = scaler.transform(X_test)
 
 
 models = {
-    "Logistic Regression": LogisticRegression(max_iter=1000),
-    "Random Forest": RandomForestClassifier(),
-    "Decision Tree": DecisionTreeClassifier(),
-    "KNN": KNeighborsClassifier()
+    "Linear Regression": LinearRegression(),
+    "Random Forest": RandomForestRegressor(),
+    "Decision Tree": DecisionTreeRegressor(),
+    "KNN": KNeighborsRegressor()
 }
 
 best_model = None
-best_accuracy = 0
+best_mae = float('inf')
 
 print("\nModel Performance:\n")
 
@@ -85,14 +85,14 @@ for name, model in models.items():
     model.fit(X_train, y_train)
     predictions = model.predict(X_test)
 
-    acc = accuracy_score(y_test, predictions)
+    mae = mean_absolute_error(y_test, predictions)
+    r2 = r2_score(y_test, predictions)
 
-    print(f"{name} Accuracy: {acc:.4f}")
-    print(classification_report(y_test, predictions))
+    print(f"{name} MAE: {mae:.4f}, R2: {r2:.4f}")
     print("-" * 50)
 
-    if acc > best_accuracy:
-        best_accuracy = acc
+    if mae < best_mae:
+        best_mae = mae
         best_model = model
         best_model_name = name
 
@@ -105,5 +105,5 @@ pickle.dump(scaler, open("scaler.pkl", "wb"))
 pickle.dump(list(X.columns), open("columns.pkl", "wb"))
 
 print(f"\n Best Model: {best_model_name}")
-print(f" Accuracy: {best_accuracy:.4f}")
+print(f" MAE: {best_mae:.4f}")
 print(" Model saved successfully!")
