@@ -34,23 +34,20 @@ df = df.dropna()
 # Create PASS/FAIL target
 df["pass"] = df["G3"].apply(lambda x: 1 if x >= 10 else 0)
 
-# Drop unnecessary columns
-df = df.drop(["G1", "G2", "G3"], axis=1)
+# Select only the features used in frontend
+selected_features = ["studytime", "failures", "absences"]
+df = df[selected_features + ["pass"]]
 
 # ...............................................
 # 4. ENCODE CATEGORICAL DATA
 
+# No categorical data in selected features
 
-categorical_cols = df.select_dtypes(include=["object"]).columns
+print("\nUsing selected features: studytime, failures, absences")
 
-label_encoders = {}
+# No categorical data in selected features
 
-for col in categorical_cols:
-    le = LabelEncoder()
-    df[col] = le.fit_transform(df[col])
-    label_encoders[col] = le
-
-print("\nCategorical columns encoded!")
+print("\nUsing selected features: studytime, failures, absences")
 
 # ........................................................
 # 5. SPLIT DATA
@@ -109,7 +106,6 @@ for name, model in models.items():
 
 pickle.dump(best_model, open("model.pkl", "wb"))
 pickle.dump(scaler, open("scaler.pkl", "wb"))
-pickle.dump(label_encoders, open("encoders.pkl", "wb"))
 
 print(f"\n Best Model: {best_model_name}")
 print(f" Accuracy: {best_accuracy:.4f}")
