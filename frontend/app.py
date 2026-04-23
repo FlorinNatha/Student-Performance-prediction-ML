@@ -15,4 +15,9 @@ if st.button("Predict"):
     }
 
     res = requests.post("http://localhost:8000/predict", json=data)
-    st.write(res.json())
+    result = res.json()
+    prediction = result["prediction"]
+    if prediction == 1:
+        st.success("The student is predicted to PASS!")
+    else:
+        st.error("The student is predicted to FAIL!")
