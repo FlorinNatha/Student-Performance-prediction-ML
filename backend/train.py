@@ -34,8 +34,8 @@ df = df.dropna()
 # Create PASS/FAIL target
 df["pass"] = df["G3"].apply(lambda x: 1 if x >= 10 else 0)
 
-# Select only the features used in frontend
-selected_features = ["studytime", "failures", "absences"]
+# Select only the specified features
+selected_features = ["studytime", "failures", "absences", "Medu", "Fedu", "famrel", "goout", "Dalc", "Walc", "health"]
 df = df[selected_features + ["pass"]]
 
 # ...............................................
@@ -43,11 +43,7 @@ df = df[selected_features + ["pass"]]
 
 # No categorical data in selected features
 
-print("\nUsing selected features: studytime, failures, absences")
-
-# No categorical data in selected features
-
-print("\nUsing selected features: studytime, failures, absences")
+print("\nUsing selected features:", selected_features)
 
 # ........................................................
 # 5. SPLIT DATA
@@ -106,6 +102,7 @@ for name, model in models.items():
 
 pickle.dump(best_model, open("model.pkl", "wb"))
 pickle.dump(scaler, open("scaler.pkl", "wb"))
+pickle.dump(list(X.columns), open("columns.pkl", "wb"))
 
 print(f"\n Best Model: {best_model_name}")
 print(f" Accuracy: {best_accuracy:.4f}")

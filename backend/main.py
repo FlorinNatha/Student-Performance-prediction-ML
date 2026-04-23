@@ -6,6 +6,7 @@ app = FastAPI()
 
 model = pickle.load(open("model.pkl", "rb"))
 scaler = pickle.load(open("scaler.pkl", "rb"))
+columns = pickle.load(open("columns.pkl", "rb"))
 
 @app.get("/")
 def home():
@@ -13,8 +14,8 @@ def home():
 
 @app.post("/predict")
 def predict(data: dict):
-    features = np.array(list(data.values())).reshape(1, -1)
+    features = [data[col] for col in columns]
+    features = np.array(features).reshape(1, -1)
     features = scaler.transform(features)
-
     prediction = model.predict(features)
     return {"prediction": int(prediction[0])}
