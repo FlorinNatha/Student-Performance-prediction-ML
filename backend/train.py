@@ -78,6 +78,7 @@ models = {
 
 best_model = None
 best_mae = float('inf')
+metrics = {}
 
 print("\nModel Performance:\n")
 
@@ -88,6 +89,8 @@ for name, model in models.items():
     mae = mean_absolute_error(y_test, predictions)
     r2 = r2_score(y_test, predictions)
 
+    metrics[name] = {"MAE": mae, "R2": r2}
+
     print(f"{name} MAE: {mae:.4f}, R2: {r2:.4f}")
     print("-" * 50)
 
@@ -96,6 +99,11 @@ for name, model in models.items():
         best_model = model
         best_model_name = name
 
+# Save feature importances if available
+feature_importances = None
+if hasattr(best_model, 'feature_importances_'):
+    feature_importances = best_model.feature_importances_
+
 #.............................................
 # 8. SAVE MODEL & OBJECTS
 
@@ -103,6 +111,9 @@ for name, model in models.items():
 pickle.dump(best_model, open("model.pkl", "wb"))
 pickle.dump(scaler, open("scaler.pkl", "wb"))
 pickle.dump(list(X.columns), open("columns.pkl", "wb"))
+pickle.dump(metrics, open("metrics.pkl", "wb"))
+if feature_importances is not None:
+    pickle.dump(feature_importances, open("feature_importances.pkl", "wb"))
 
 print(f"\n Best Model: {best_model_name}")
 print(f" MAE: {best_mae:.4f}")
