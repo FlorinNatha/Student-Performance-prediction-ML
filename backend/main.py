@@ -17,5 +17,6 @@ def predict(data: dict):
     features = [data[col] for col in columns]
     features = np.array(features).reshape(1, -1)
     features = scaler.transform(features)
-    prediction = model.predict(features)
-    return {"prediction": int(prediction[0])}
+    prediction = model.predict(features)[0]
+    prediction = max(0, min(20, round(prediction)))
+    return {"prediction": prediction}
